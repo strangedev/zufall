@@ -48,7 +48,8 @@ Zufall.TYPES;
   'string', 'integer',
   'number', 'NaN',
   'null',   'undefined',
-  'Array',  'Object'
+  'Array',  'Object',
+  'boolean'
 ]
 */
 ```
@@ -57,7 +58,7 @@ Zufall distinguishes between `VALUE_TYPES` and `OBJECT_TYPES`:
 
 ```javascript
 Zufall.VALUE_TYPES;
-// OUT: ['string', 'integer', 'number', 'NaN', 'null', 'undefined']
+// OUT: ['string', 'integer', 'number', 'NaN', 'null', 'undefined', 'boolean' ]
 
 Zufall.OBJECT_TYPES;
 // OUT: ['Array', 'Object']
