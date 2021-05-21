@@ -3,6 +3,7 @@
   "version": "1.0.1",
   "description": "Library for generating random things for testing purposes",
   "main": "index.js",
+  "types": "index.d.ts",
   "repository": "git@github.com:strangedev/zufall.git",
   "author": "Noah Hummel <hummel@marvelous.systems>",
   "license": "Apache-2.0",
