@@ -25,7 +25,7 @@ declare namespace zufall {
     function randInt(n?: number): number;
     function randNum(n?: number): number;
     function randomBoolean(): boolean;
-    function randomWord(len: number): string;
+    function randomWord(len?: number): string;
     function randomValue(): any;
     function randomArray(n?: number): any[];
     function randomArrayOf(type: TYPE, n?: number): any[];
