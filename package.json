@@ -1,6 +1,6 @@
 {
   "name": "zufall",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Library for generating random things for testing purposes",
   "main": "index.js",
   "repository": "git@github.com:strangedev/zufall.git",
