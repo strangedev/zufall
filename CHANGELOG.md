@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/strangedev/zufall/compare/v1.0.2...v1.1.0) (2021-05-25)
+
+
+### Features
+
+* Add type declaration file. ([#8](https://github.com/strangedev/zufall/issues/8)) ([cda7bda](https://github.com/strangedev/zufall/commit/cda7bda46d66c740345433cb0976b50385e839f6))
+
 ## [1.0.2](https://github.com/strangedev/zufall/compare/v1.0.1...v1.0.2) (2021-05-25)
 
 

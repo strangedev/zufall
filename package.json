@@ -1,6 +1,6 @@
 {
   "name": "zufall",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Library for generating random things for testing purposes",
   "main": "index.js",
   "types": "index.d.ts",
