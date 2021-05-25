@@ -8,11 +8,11 @@
   "license": "Apache-2.0",
   "private": false,
   "dependencies": {
-    "mongodb": "^3.3.2",
-    "ramda": "^0.26.1"
+    "mongodb": "3.6.8",
+    "ramda": "0.27.1"
   },
   "devDependencies": {
-    "jest": "^24.9.0"
+    "jest": "27.0.0"
   },
   "scripts": {
     "test": "jest"
