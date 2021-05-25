@@ -12,7 +12,8 @@
     "ramda": "0.27.1"
   },
   "devDependencies": {
-    "jest": "27.0.0"
+    "jest": "27.0.0",
+    "semantic-release": "17.4.3"
   },
   "scripts": {
     "test": "jest"
