@@ -1,4 +1,4 @@
-declare namespace zufall {
+declare module 'zufall' {
     // I don't want to import the mongodb types just for this.
     type ObjectID = any;
     interface DbRef {
