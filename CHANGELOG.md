@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/strangedev/zufall/compare/v1.1.1...v1.1.2) (2022-02-09)
+
+
+### Bug Fixes
+
+* update dependencies due to security issues ([#20](https://github.com/strangedev/zufall/issues/20)) ([58b2005](https://github.com/strangedev/zufall/commit/58b2005abacf60042f289132f9f73733591665db))
+
 ## [1.1.1](https://github.com/strangedev/zufall/compare/v1.1.0...v1.1.1) (2021-05-25)
 
 
