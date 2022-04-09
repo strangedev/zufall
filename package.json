@@ -9,7 +9,7 @@
   "license": "Apache-2.0",
   "private": false,
   "dependencies": {
-    "mongodb": "4.4.1",
+    "mongodb": "4.5.0",
     "ramda": "0.28.0"
   },
   "devDependencies": {
