@@ -1,5 +1,7 @@
 # zufall
 
+[![npm version](https://badge.fury.io/js/zufall.svg)](https://badge.fury.io/js/zufall)
+
 A small JS/TS library for generating random numbers and sampling data,
 because using `Math.random()` is tiresome.
 
