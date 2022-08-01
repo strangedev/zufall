@@ -19,6 +19,8 @@ We reckon that it is more important to provide a few focussed functions that you
 can build on, instead of providing many small functions for every possible use
 case.
 
+You can find the v1 docs here: https://github.com/strangedev/zufall/blob/v1.1.2/README.md
+
 In v2 we removed:
 - The `TYPES`, `VALUE_TYPES`, and `OBJECT_TYPES` constants. If you want to create random values of certain types, you can easily do so by combining the other functions like `draw`, `randomInteger`, and `randomArrayBy`.
 - The `randomValue`, `randomThing`, `randomThingOf`, `randomThingOfTypes`, `randomArrayOf`, `randomObjectOf`, and `randomObjectOfTypes` functions. These were meant for fuzzing purposes, but we discovered that their behavior was too unpredictable in real world applications, as you couldn't control the random generation enough. If you need to generate random inputs, combine the `randomInteger`, `randomNumber`, `randomString`, `draw` and the `randomArrayBy` and `randomObjectBy`functions.
