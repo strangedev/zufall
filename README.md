@@ -5,7 +5,7 @@
 A small JS/TS library for generating random numbers and sampling data,
 because using `Math.random()` is tiresome.
 
-"Zufall" is a german for "chance" or "coincidence". When something happens "per Zufall", it happens at random.
+"Zufall" is german for "chance" or "coincidence". When something happens "per Zufall", it happens at random.
 
 This library is aimed at testing and other _non-security_ applications. It
 is just a wrapper for `Math.random()`, so don't expect any cryptographic
