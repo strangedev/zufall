@@ -1,4 +1,4 @@
-# zufall `[ˈt͡suːˌfal]`
+# zufall - [_ˈt͡suːˌfal_]
 
 [![npm version](https://badge.fury.io/js/zufall.svg)](https://badge.fury.io/js/zufall)
 
