@@ -44,13 +44,6 @@ Some of the function signatures have also changed:
 
 We also added a `shuffle` function that you can use to immutably shuffle arrays!
 
-## Table of Contents
-
-- [Installation](#installation)
-- [Usage](#usage)
-- [Support](#support)
-- [Contributing](#contributing)
-
 ## Installation
 
 Install from npmjs.com:
