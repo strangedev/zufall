@@ -139,7 +139,7 @@ between each draw (meaning you can have duplicates), you can use `draw`.
 
 ```ts
 // Here, the size can be as large as you want!
-draw(['heaas', 'tails'], 20); 
+draw(['heads', 'tails'], 20); 
 ```
 
 ### Shuffling arrays
