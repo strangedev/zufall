@@ -1,11 +1,46 @@
 # zufall
 
-A small javaScript library for generating random things.
-The aim of this library is to facilitate testing and fuzzing
-by making it easy to generate random inputs.
+A small JS/TS library for generating random numbers and sampling data,
+because using `Math.random()` is tiresome.
 
-At the moment, primitive types, Arrays, Objects and mongodb-style DbRefs are
-supported.
+This library is aimed at testing and other _non-security_ applications. It
+is just a wrapper for `Math.random()`, so don't expect any cryptographic
+properties from it!
+
+## Migrating to v2
+
+Zufall has been rewritten in TypeScript! It is now more streamlined, too.
+Only the basic functions are included now, removing the dependency on mongodb
+that we had before.
+
+We reckon that it is more important to provide a few focussed functions that you
+can build on, instead of providing many small functions for every possible use
+case.
+
+In v2 we removed:
+- The `TYPES`, `VALUE_TYPES`, and `OBJECT_TYPES` constants. If you want to create random values of certain types, you can easily do so by combining the other functions like `draw`, `randomInteger`, and `randomArrayBy`.
+- The `randomValue`, `randomThing`, `randomThingOf`, `randomThingOfTypes`, `randomArrayOf`, `randomObjectOf`, and `randomObjectOfTypes` functions. These were meant for fuzzing purposes, but we discovered that their behavior was too unpredictable in real world applications, as you couldn't control the random generation enough. If you need to generate random inputs, combine the `randomInteger`, `randomNumber`, `randomString`, `draw` and the `randomArrayBy` and `randomObjectBy`functions.
+- The `randomType`, `randomValueType` and `randomTypeExcept` functions. These were meant as helpers for the aforementioned functions, so they served no purpose anymore.
+- The object generation function `randomObjectWithDepth`. Its behavior can be accomplished using `randomObjectBy`.
+- The `randomObjects` function, as it can be built easily by combining `randomArrayBy` and `randomObjectBy`, and doing it manually gives more control.
+- The `randomDbRef`, `randomDbRefs`, and `randomDocument` functions. These were very specific to one use case, which was the use case we had when writing this library. Since then, we wanted to use the library in different contexts and even the browser, and having the dependency on mongodb proved to be a limitation.
+- The `words` constant. Get your own words ;D
+- The `isPrefixOf` helper. It does not belong in this library.
+
+We also renamed some things:
+- `randInt` and `randNum` have been renamed to `randomInteger` and `randomNumber`.
+- `chooseN` is now called `sample`, as it models sampling a populace.
+- `chooseNReplace` is now called `draw`, as it models drawing numbers.
+- `randomWord` is now called `randomString` to better match the naming of the other functions.
+
+Some of the function signatures have also changed:
+- `randomInteger` now receives a minimum and a maximum parameter.
+- `randomNumber` now receives a minimum and a maximum parameter.
+- `randomArrayBy` now receives an exact length instead of randomizing the length based on the given parameter.
+- `randomObjectBy` now receives an exact length instead of randomizing the length based on the given parameter.
+- `randomString` now receives an exact length instead of randomizing the length based on the given parameter.
+
+We also added a `shuffle` function that you can use to immutably shuffle arrays!
 
 ## Table of Contents
 
@@ -19,8 +54,8 @@ supported.
 Install from npmjs.com:
 
 ```sh
-yarn add zufall
-yarn add -D zufall # when used for testing
+npm install zufall
+npm install -D zufall # when used for testing
 ```
 
 ## Usage
@@ -34,559 +69,154 @@ const Zufall = require("zufall");
 ES6:
 
 ```javascript
-import Zufall from "zufall";
+import { draw, choose } from "zufall";
 ```
 
-### Types
+### Generating random numbers
 
-Zufall uses strings to indicate types. Obtain a list of all types:
+You can generate random floats and integers with zufall.
+You can either get a value between 0 and `Math.MAX_VALUE`, if you don't pass
+any parameters, or you can adjust the allowed interval by passing a minimum
+and a maximum.
 
-```javascript
-Zufall.TYPES;
-/* OUT:
-[
-  'string', 'integer',
-  'number', 'NaN',
-  'null',   'undefined',
-  'Array',  'Object',
-  'boolean'
-]
-*/
+_Note:_ The `maximum` is always excluded from the interval! In mathematical
+terms, the value if chosen from the interval `[min; max)`. This has been chosen
+to be compatible with `Math.random()`, which also excludes the 1, and it also
+makes it easier to work with array indices.
+
+```ts
+// Generate a random float between 0 and Math.MAX_VALUE 
+randomNumber();
+
+// Generate a random float between 2 and 11
+randomNumber(2, 11);
+
+// The minimum can also be negative!
+randomNumber(-3, 4);
 ```
 
-Zufall distinguishes between `VALUE_TYPES` and `OBJECT_TYPES`:
+```ts
+// Generate a random integer between 0 and Math.MAX_VALUE 
+randomInteger();
 
-```javascript
-Zufall.VALUE_TYPES;
-// OUT: ['string', 'integer', 'number', 'NaN', 'null', 'undefined', 'boolean' ]
+// Generate a random integer between 2 and 11
+randomInteger(2, 11);
 
-Zufall.OBJECT_TYPES;
-// OUT: ['Array', 'Object']
+// The minimum can also be negative!
+randomInteger(-3, 4);
 ```
 
-You can find out the type of a value by using `Zufall.typeOf()`:
+### Generating random strings
 
-```javascript
-Zufall.typeOf("test");
-// OUT: 'string'
+You can generate random strings with zufall. These are not really random, but
+you can use them if you need some placeholder text in a pinch.
 
-Zufall.typeOf(1);
-// OUT: 'integer'
-
-Zufall.typeOf(["test"]);
-// OUT: 'Array'
+```ts
+// Get a random string with 12 characters in it.
+randomString(12);
 ```
 
-#### `Zufall.randomType :: string`
+### Drawing and sampling from arrays
 
-Returns a random type string.
+You can choose a random element from an array using `choose`:
 
-```javascript
-Zufall.randomType();
-// OUT: 'NaN'
+```ts
+choose([1, 2, 3, 4]);
 ```
 
-#### `Zufall.randomValueType :: string`
+If you want to choose multiple elements without replacing the element between
+draws, you can use `sample`.
 
-Returns a random value type string.
+```ts
+sample([1, 2, 3, 4], 3);
 
-```javascript
-Zufall.randomValueType();
-// OUT: 'number'
+// The sample size can't be larger than the given array!
+sample([1, 2, 3, 4], 5); // :(
 ```
 
-#### `Zufall.randomTypeExcept :: [string] -> string`
+If you want to choose multiple elements from an array and replace the elements
+between each draw (meaning you can have duplicates), you can use `draw`.
 
-Returns a random type string, excludes given types from being selected.
-
-```javascript
-Zufall.randomTypeExcept(["NaN", "number", "integer", ...Zufall.OBJECT_TYPES]);
-// OUT: 'string'
+```ts
+// Here, the size can be as large as you want!
+draw(['heaas', 'tails'], 20); 
 ```
 
-### Monte-Carlo
+### Shuffling arrays
 
-#### `Zufall.choose :: [a] -> a`
+To shuffle an array, you can use the `shuffle` function. The function does not
+modify the original array. This also means that this function copies the input
+array, so be careful when trying to shuffle really large arrays.
 
-Randomly choose a single element from an Array.
-
-```javascript
-Zufall.choose([1, 2, 3]);
-// OUT: 1
+```ts
+shuffle([1, 2, 3, 4]);
 ```
 
-#### `Zufall.chooseN :: [a] -> integer -> [a]`
+### Generating random arrays
 
-Choose a subset of length n from an Array by
-choosing without replacement. Throws if n is
-greater than the number of choices.
+You can generate random arrays by using `randomArrayBy`. You need to supply a
+generator function, which will be called once for every item you want to have
+in your array. If you want to have an array with 5 items, it will be called 5
+times.
 
-```javascript
-Zufall.chooseN([1, 2, 3], 2);
-// OUT: [3, 1]
-```
+The generator function receives the index of the element it should generate and
+the current array. It should return the element at the given index.
 
-#### `Zufall.chooseNReplace :: [a] -> integer -> [a]`
+```ts
+randomArrayBy(() => randomInteger(10));
+// e.g.: [ 4, 6, 3, 3, 6, 7, 4]
 
-Choose a subset of length n from an Array by
-choosing with replacement.
-
-```javascript
-Zufall.chooseNReplace([1, 2, 3], 4);
-// OUT: [ 3, 1, 3, 3 ]
-```
-
-### Primitive values
-
-#### `Zufall.randomBoolean :: boolean`
-
-Returns either `true` or `false`.
-
-```javascript
-Zufall.randomBoolean();
-// OUT: false
-```
-
-#### `Zufall.randInt :: integer -> integer`
-
-Given n, returns a random integer from [0;n).
-
-```javascript
-Zufall.randInt(10);
-// OUT: 3
-```
-
-#### `Zufall.randNum :: number -> number`
-
-Given n, returns a random number from [0;n).
-
-```javascript
-Zufall.randNum(10);
-// OUT: 3.988404789833939
-```
-
-#### `Zufall.randomWord :: Optional integer -> string`
-
-Returns a random string by concatenating n words.
-
-```javascript
-Zufall.randomWord();
-// OUT: 'atomfuß'
-Zufall.randomWord(3);
-// OUT: 'karrengeschwurbelpunkt'
-```
-
-#### `Zufall.randomValue :: (ValueType a) => a`
-
-Returns a random value of random VALUE_TYPE.
-
-```javascript
-Zufall.randomValue();
-// OUT: 'fußgeschwurbel'
-Zufall.randomValue();
-// OUT: 7709165238833651
-Zufall.randomValue();
-// OUT: undefined
-```
-
-### Arrays
-
-Arrays are generated with random length per default. The methods provided take an upper limit for the array length so that the resulting array will be between 0 and n elements long.
-
-#### `Zufall.randomArray :: (ValueType a) => Optional integer -> [a]`
-
-Generates an array of a single random VALUE_TYPE.
-Optionally takes an upper limit for the array size.
-
-```javascript
-Zufall.randomArray();
-// OUT: [ undefined, undefined, undefined ]
-Zufall.randomArray();
-/* OUT: 
-[
-  7215554091823195, 4722635101592093,
-  493279431500843,  759458253392443
-]
-*/
-Zufall.randomArray();
-/* OUT:
-[
-  1.249291526663151e+308,
-  1.3237729018799112e+308,
-  1.172642447815066e+308
-]
-*/
-Zufall.randomArray(0);
-// OUT: []
-Zufall.randomArray(2);
-// OUT: [ null ]
-```
-
-#### `Zufall.randomArrayOf :: (Type a) => string -> Optional integer -> [a]`
-
-Generates an array of a single given type.
-Optionally takes an upper limit for the array size.
-
-```javascript
-Zufall.randomArrayOf("number", 2);
-// [ 1.2744062956612279e+308 ]
-Zufall.randomArrayOf("Object", 2);
-/* OUT:
-[
-  {
-    mauzikarren: undefined,
-    anneatom: 'gedönsmate',
-    mauzianne: null,
-    geschwurbelanne: 1.6867571167985551e+308,
-    karrenlampe: 'punktchong',
-    kleberdemokratie: 1.1276508106109448e+308,
-    klappebauer: 4.044959369454694e+307,
-    randommate: 1984869837046861,
-    einhorndemokratie: undefined,
-    gretanne: null
-  }
-]
-/*
-```
-
-#### `Zufall.randomArrayBy :: (Type a) => ([a] -> a) -> Optional integer -> [a]`
-
-Generates an array by succesively calling a
-generator function. The generator function
-receives the current array and returns the next
-element that should be added to it.
-Optionally takes an upper limit for the array size.
-
-```javascript
-Zufall.randomArrayBy(() => Zufall.randInt(10));
-// OUT: [ 4, 6, 3, 3, 6, 7, 4]
-
-// generate unique numbers by checking
-// if the next number is already contained in
-// the array
-const generatorFn = ary => {
+const generatorFn = (i, currentArray) => {
   let nextElement;
+
   do {
-    nextElement = Zufall.randInt(100);
-  } while (ary.includes(nextElement));
+    nextElement = randomInteger(100);
+  } while (currentArray.includes(nextElement));
+  
   return nextElement;
 };
-Zufall.randomArrayBy(generatorFn);
-// OUT: [ 73, 29, 25, 31, 11, 86, 34,  9]
+
+randomArrayBy(generatorFn);
+// e.g.: [ 73, 29, 25, 31, 11, 86, 34,  9]
 ```
 
-### Objects
+### Generating random objects
 
-#### `Zufall.randomObject :: Optional integer -> Object`
+You can generate random objects by using `randomObjectBy`. You need to supply a
+generator function, which will be called once for every key-value pair you want
+to have in your object. If you want to have an object with 5 properties, it will
+be called 5 times.
 
-Generates an object with a random number of
-entries. Entries have random types.
-Optionally takes an upper limit for the number
-of entries. Does not nest Objects, see
-`Zufall.randomObjectWithDepth()`.
+The generator function receives the index of the element it should generate and
+the current object. It should return a key-value pair for the generated property.
 
-```javascript
-Zufall.randomObject();
-/* OUT: 
-{ 
-    saftkopf: true, 
-    fliegelampe: 6151540800962309, 
-    laz0rkleber: NaN 
-}
-*/
-Zufall.randomObject(4);
-// OUT: { gretklappe: 1.1503044327731994e+308 }
-Zufall.randomObject(4);
-// OUT: {}
-Zufall.randomObject(4);
-/* OUT: 
-{ 
-    'mauzifuß': 'mauzilampe', 
-    bauergeschwurbel: 'mauzigeschwurbel'     
-}
-*/
-Zufall.randomObject(4);
-/* OUT:
-{ 
-    kleberbauer: 5807444775408303,
-    lampechong: undefined 
-}
-*/
-```
-
-#### `Zufall.randomObjects :: Optional integer -> [Object]`
-
-Generates a fixed-length array of random Objects
-using `Zufall.randomObject()`.
-The length is optional and defaults to 64.
-
-```javascript
-Zufall.randomObjects(10);
-/* OUT:
-[
-  {}, {}, {}, {}, {},
-  {}, {}, {}, {}, {}
-]
-*/
-```
-
-#### `Zufall.randomObjectOf :: string -> Optional integer -> Object`
-
-Given a type, generates an Object with a random
-amount of entries of the type. Optionally takes an
-upper limit for the number of entries.
-
-```javascript
-Zufall.randomObjectOf("string", 3);
-/* OUT: 
-{ 
-    kopffliege: 'karrenanne',
-    lampefliege: 'matebauer'
-}
-*/
-```
-
-#### `Zufall.randomObjectOfTypes :: [string] -> Optional integer -> Object`
-
-Given a list of types, chooses a type at random
-and creates an Object with a random amount of
-entries of the type. Optionally takes an
-upper limit for the number of entries.
-
-```javascript
-Zufall.randomObjectOfTypes(["null", "undefined"], 3);
-/* OUT:
-{
-    chonglaz0r: undefined,
-    mauzibauer: null
-}
-*/
-```
-
-#### `Zufall.randomObjectBy :: (Type a) => (Object -> a) -> Optional integer -> Optional boolean -> Object`
-
-Generates an Object by succesively calling a
-generator function. The generator function
-receives the current Object and returns the next
-value that should be added to it.
-Optionally takes an upper limit for the number
-of entries.
-
-```javascript
-Zufall.randomObjectBy(() => Zufall.randInt(10));
-// OUT: { lampeklappe: 8, chongzwerg: 8, 'ülfsaft': 6 }
+```ts
+randomObjectBy(() => [ randomString(), randomInteger(10) ], 3);
+// e.g.: { lampe: 8, zwerg: 8, saft: 6 }
 
 // generate unique numbers by checking
 // if the next number is already contained in
 // the object
-const generatorFn = o => {
+const generatorFn = (i, currentObject) => {
   let nextElement;
+
   do {
-    nextElement = Zufall.randInt(100);
-  } while (Object.values(o).includes(nextElement));
-  return nextElement;
+    nextElement = randomInteger(100);
+  } while (Object.values(currentObject).includes(nextElement));
+
+  return [ randomString(), nextElement ];
 };
-Zufall.randomObjectBy(generatorFn, 4);
-// OUT: { fliegezwerg: 69, geschwurbelsheesh: 3 }
+
+randomObjectBy(generatorFn, 2);
+// e.g.: { fliege: 69, geschwurbel: 3 }
 ```
 
-#### `Zufall.randomObjectWithDepth :: integer -> Optional integer -> Object`
+## Running quality assurance
 
-Given d, generates a random Object with a
-guaranteed Object nesting depth d.
-Optionally takes the maximum branching factor
-of the resulting Object.
-
-**Careful**: Certain combinations of large depth
-and large branching factors may take a considerably
-amount of time to generate.
-
-```javascript
-Zufall.randomObjectWithDepth(3, 3);
-/* OUT: 
-{
-  'hörnchenklappe': {
-    'fußrundi': { atomsheesh: null },
-    chongeinhorn: { kopfanne: undefined }
-  },
-  randomzwerg: { chongchong: {} }
-}
-*/
-```
-
-### DbRefs
-
-Borrowed from [mongodb](https://docs.mongodb.com/manual/reference/database-references/), DbRefs are
-a format for storing relationships in a document-based
-database. Zufall uses the following `DbRef` format:
-
-```json
-{
-  "collection": "saftfliege",
-  "id": "5d77f0562693be5c4cc88c3a"
-}
-```
-
-#### `Zufall.randomDbRef :: Object`
-
-Generates an Object formatted like a `DbRef`.
-
-```javascript
-Zufall.randomDbRef();
-/* OUT:
-{
-    collection: 'sheeshlan',
-    id: '5d77f0a52693be5c4cc88c3b'
-}
-*/
-```
-
-#### `Zufall.randomDbRefs :: Optional integer -> [Object]`
-
-Generates a fixed-length Array of random DbRefs.
-The length is optional and defaults to 64.
-
-```javascript
-Zufall.randomDbRefs(5);
-/* OUT:
-[
-  { 
-    collection: 'gedönskramp',
-    id: '5d77f10d2693be5c4cc88c55' 
-  },
-  { 
-    collection: 'matekramp',
-    id: '5d77f10d2693be5c4cc88c56'
-  },
-  { 
-    collection: 'laz0rrundi',
-    id: '5d77f10d2693be5c4cc88c57'
-  },
-  {
-    collection: 'kopfsaft',
-    id: '5d77f10d2693be5c4cc88c58'
-  },
-  {
-    collection: 'fußdemokratie',
-    id: '5d77f10d2693be5c4cc88c59'
-  }
-]
-*/
-```
-
-#### `Zufall.randomDocument :: integer -> Optional integer -> Optional integer -> Object`
-
-Generates a (nested) object and inserts a number
-of random DbRefs into it. Returns an Object
-containing the generated document, a Map
-of paths to DbRef Object in order to find the
-DbRefs in the generated document and an Array
-of all collections referenced in the document.
-
-The second parameter is optional and determines
-the maximum number of DbRefs inserted.
-The thirs parameter is optional and determines
-the branching factor of the document.
-
-```javascript
-let ret = Zufall.randomDocument(3, 3, 3);
-ret.root;
-/* OUT: 
-{ 
-   "kopfatom":{ 
-      "lanrandom":{ 
-         "punktlaz0r":null,
-         "atomsheesh":false
-      },
-      "gedönsatom":{ 
-
-      }
-   },
-   "punktrundi":{ 
-      "laz0rkopf":{ 
-         "collection":"lampeanne",
-         "id":"5d77f32bc8a8486167164f4a"
-      }
-   }
-}
-*/
-ret.dbrefs;
-/* OUT:
-Map {
-  [ 'punktrundi', 'laz0rkopf' ] => { collection: 'lampeanne', id: '5d77f32bc8a8486167164f4a' }
-}
-*/
-ret.collections;
-// OUT: [ 'lampeanne' ]
-```
-
-### Madness
-
-#### `Zufall.randomThing :: (Type a) => a`
-
-Returns a random thing of any type.
-
-```javascript
-Zufall.randomThing();
-// OUT: true
-Zufall.randomThing();
-// OUT: undefined
-Zufall.randomThing();
-// OUT: 2289309868526099
-Zufall.randomThing();
-// OUT: 'einhornhörnchen'
-```
-
-#### `Zufall.randomThingOf :: (Type a) => string -> a`
-
-Returns a random thing of the given type.
-
-```javascript
-Zufall.randomThingOf("string");
-// OUT: 'laz0rkarren'
-Zufall.randomThingOf("integer");
-// OUT: 3889316909728921
-```
-
-#### `Zufall.randomThingOfTypes :: (Type a) => [string] -> a`
-
-Chooses a type from a given array of types, the returns
-a random thing of the type.
-
-```javascript
-Zufall.randomThingOfTypes(["number", "integer"]);
-// OUT: 7.393000727470504e+307
-```
-
-### Helpers
-
-#### `Zufall.isPrefixOf :: (Eq a) => [a] -> [a] -> boolean`
-
-Returns true, if second argument is a prefix of
-the first.
-
-```javascript
-Zufall.isPrefixOf([1, 2, 3, 4], [1, 2]);
-// OUT: true
-Zufall.isPrefixOf([1, 2, 3, 4], []);
-// OUT: true
-Zufall.isPrefixOf([1, 2, 3, 4], [3, 4]);
-// OUT: false
-```
-
-#### `(constant) Zufall.words :: [string]`
-
-A list of words used to generate random strings.
-
-```javascript
-Zufall.words.slice(0, 4);
-// OUT: [ 'fuß', 'geschwurbel', 'mate', 'laz0r' ]
+```shell
+npx roboter
 ```
 
 ## Support
 
 Please [open an issue](https://github.com/strangedev/zufall/issues/new) for support.
-
-## Contributing
-
-Please contribute using [Github Flow](https://guides.github.com/introduction/flow/). Create a branch, add commits, and [open a pull request](https://github.com/strangedev/zufall/compare/).

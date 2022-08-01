@@ -1,24 +1,40 @@
 {
   "name": "zufall",
   "version": "1.1.1",
-  "description": "Library for generating random things for testing purposes",
-  "main": "index.js",
-  "types": "index.d.ts",
-  "repository": "git@github.com:strangedev/zufall.git",
-  "author": "Noah Hummel <hummel@marvelous.systems>",
-  "license": "Apache-2.0",
+  "description": "Library for generating random things for testing purposes.",
+  "contributors": [
+    {
+      "name": "Noah Hummel",
+      "email": "strangedev@posteo.net"
+    },
+    {
+      "name": "Hannes Leutloff",
+      "email": "hannes.leutloff@yeldirium.de"
+    }
+  ],
   "private": false,
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
   "dependencies": {
-    "mongodb": "4.3.1",
-    "ramda": "0.28.0"
+    "@types/lodash": "4.14.182",
+    "common-tags": "1.8.2",
+    "defekt": "9.2.0",
+    "lodash": "4.17.21"
   },
   "devDependencies": {
     "@semantic-release/changelog": "6.0.1",
     "@semantic-release/git": "10.0.1",
-    "jest": "27.5.1",
-    "semantic-release": "19.0.2"
+    "assertthat": "6.5.2",
+    "roboter": "13.1.0",
+    "semantic-release": "19.0.2",
+    "typescript": "4.6.4"
   },
   "scripts": {
-    "test": "jest"
-  }
+    "test": "npx roboter test"
+  },
+  "repository": "git@github.com:strangedev/zufall.git",
+  "keywords": [
+    "random"
+  ],
+  "license": "Apache-2.0"
 }

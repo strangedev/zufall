@@ -136,3 +136,5 @@ GitHub.sublime-settings
 .history
 
 # End of https://www.gitignore.io/api/node,sublimetext,visualstudiocode
+
+.idea
