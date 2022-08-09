@@ -18,7 +18,7 @@
   "dependencies": {
     "@types/lodash": "4.14.182",
     "common-tags": "1.8.2",
-    "defekt": "9.2.0",
+    "defekt": "9.3.0",
     "lodash": "4.17.21"
   },
   "devDependencies": {
