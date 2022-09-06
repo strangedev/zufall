@@ -1,9 +1,3 @@
-import cloneDeep from 'lodash/cloneDeep';
-import { defekt } from 'defekt';
-import { oneLine } from 'common-tags';
-
-class ParameterIsOutOfRange extends defekt({ code: 'ParameterIsOutOfRange' }) {}
-
 const words = [
   [ 'fuß', 'geschwurbel', 'mate', 'laz0r', 'einhorn' ],
   [ 'saft', 'lampe', 'fliege', 'kleber', 'gedöns' ],
@@ -25,7 +19,7 @@ const randomInteger = (minimum?: number, maximum?: number): number => Math.floor
 const choose = <TData>(choices: TData[]): TData => choices[randomInteger(choices.length)];
 
 const shuffle = <TData>(values: TData[]): TData[] => {
-  const shuffledValues = cloneDeep(values);
+  const shuffledValues = [ ...values ];
 
   for (let i = values.length - 1; i > 0; i--) {
     const j = randomInteger(i + 1);
@@ -40,11 +34,9 @@ const shuffle = <TData>(values: TData[]): TData[] => {
 
 const sample = <TData>(choices: TData[], sampleSize: number): TData[] => {
   if (sampleSize > choices.length) {
-    throw new ParameterIsOutOfRange({
-      message: oneLine`The sample size cannot be larger than the set of choices,
-      as the sample function draws without replacement.
-      Maybe you are looking for the draw function instead?`
-    });
+    throw new Error(
+      'The sample size cannot be larger than the set of choices, as the sample function draws without replacement. Maybe you are looking for the draw function instead?'
+    );
   }
   if (sampleSize === choices.length) {
     return choices;
@@ -68,7 +60,7 @@ const sample = <TData>(choices: TData[], sampleSize: number): TData[] => {
 
 const randomArrayBy = <TData>(generatorFn: (i: number, values: TData[]) => TData, length: number): TData[] =>
   Array.from({ length }).
-  // eslint-disable-next-line @typescript-eslint/naming-convention
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     map((_: unknown, i: number): number => i).
     reduce<TData[]>(
     (result, currentIndex): TData[] => [
