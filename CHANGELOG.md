@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/strangedev/zufall/compare/v2.0.1...v2.0.2) (2022-09-06)
+
+
+### Bug Fixes
+
+* remove dependencies ([#53](https://github.com/strangedev/zufall/issues/53)) ([df2e110](https://github.com/strangedev/zufall/commit/df2e110f2f3db228d7ea2feb42f63a47cde28e77))
+
 ## [2.0.1](https://github.com/strangedev/zufall/compare/v2.0.0...v2.0.1) (2022-09-06)
 
 
