@@ -1,6 +1,6 @@
 {
   "name": "zufall",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Library for generating random things for testing purposes.",
   "contributors": [
     {

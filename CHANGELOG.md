@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/strangedev/zufall/compare/v2.0.0...v2.0.1) (2022-09-06)
+
+
+### Bug Fixes
+
+* release new docs ([f12084b](https://github.com/strangedev/zufall/commit/f12084bfc0652d68b7d90037f877d6e62e77faa9))
+
 # [2.0.0](https://github.com/strangedev/zufall/compare/v1.1.2...v2.0.0) (2022-08-01)
 
 
